@@ -17,7 +17,6 @@ typedef struct transcation_info{
 }transcation;
 
 void create_storage(int size){
-    free(storage);
     backup_storage = (int *)malloc((size/2) * sizeof(int));
     for (int i=0; i<size/2; i++) {
         backup_storage[i] = storage[i];
@@ -349,6 +348,10 @@ void file_process(char *file_name, int open_type){
         fp = stdin;
     }else if(open_type == 2){
         fp = fopen(file_name, "r");
+        if (fp == NULL) {
+            fprintf(stderr, "input file do not exist, exit program\n");
+            exit(-1);
+        }
     }
 
     char stream[1026];
@@ -495,14 +498,23 @@ void file_process(char *file_name, int open_type){
     
     //call print out function
     print_func(&list, line_processed);
+    My402ListUnlinkAll(&list);
+    
 }
 
 int main(int argc, char *argv[])
 {
     if(argc == 2){
+        if (strcmp(argv[1], "sort")) {
+            fprintf(stderr, "invalid function input, exit program\n");
+            exit(-1);
+        }
         file_process(argv[1], 1);
     }else if(argc == 3){
         file_process(argv[2], 2);
+    }else if(argc > 3 || argc == 1){
+        fprintf(stderr, "malformed commandline, exit program\n");
+        exit(-1);
     }
     return 0;
 }
